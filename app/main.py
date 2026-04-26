@@ -14,6 +14,7 @@ import json
 import uuid
 import time
 import logging
+from decimal import Decimal
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
@@ -40,6 +41,17 @@ logging.basicConfig(
 log = logging.getLogger("messenger")
 
 # ---------- Storage layer (AWS or in-memory) ----------
+
+def _decimal_to_native(obj):
+    """Recursively convert DynamoDB Decimal to int/float for JSON serialization."""
+    if isinstance(obj, list):
+        return [_decimal_to_native(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _decimal_to_native(v) for k, v in obj.items()}
+    if isinstance(obj, Decimal):
+        return int(obj) if obj == obj.to_integral_value() else float(obj)
+    return obj
+
 
 class Storage:
     def create_user(self, username: str, password_hash: str) -> dict: ...
@@ -114,6 +126,8 @@ class AWSStorage(Storage):
         self.users_table = self.ddb.Table(DDB_USERS_TABLE)
         self.messages_table = self.ddb.Table(DDB_MESSAGES_TABLE)
         self.s3 = boto3.client("s3", region_name=AWS_REGION)
+        # in-memory reactions cache (acceptable for demo; reactions don't persist across restarts)
+        self._reactions: Dict[str, Dict[str, set]] = {}
         log.info("AWS storage initialized")
 
     def create_user(self, username, password_hash):
@@ -144,7 +158,22 @@ class AWSStorage(Storage):
             ScanIndexForward=True,
             Limit=limit,
         )
-        return r.get("Items", [])
+        items = r.get("Items", [])
+        # attach reactions from in-memory cache
+        for m in items:
+            mid = m.get("id")
+            r = self._reactions.get(mid, {})
+            m["reactions"] = {emoji: sorted(users) for emoji, users in r.items() if users}
+        return items
+
+    def toggle_reaction(self, msg_id: str, emoji: str, username: str) -> Dict[str, list]:
+        bucket = self._reactions.setdefault(msg_id, {}).setdefault(emoji, set())
+        if username in bucket:
+            bucket.remove(username)
+        else:
+            bucket.add(username)
+        all_emojis = self._reactions.get(msg_id, {})
+        return {e: sorted(users) for e, users in all_emojis.items() if users}
 
     def list_rooms(self, username):
         # simplified — in real prod we'd have a separate user-rooms table
@@ -306,6 +335,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str, token: str):
         m2 = dict(m)
         m2["msg_type"] = m2.pop("type", "text")
         history_payload.append(m2)
+    history_payload = _decimal_to_native(history_payload)
     await websocket.send_json({"type": "history", "messages": history_payload})
 
     # send presence to everyone
@@ -351,6 +381,7 @@ async def websocket_endpoint(websocket: WebSocket, room: str, token: str):
                 continue
             saved = storage.save_message(room, username, content, msg_type)
             payload = {"type": "message", "msg_type": saved.pop("type"), **saved}
+            payload = _decimal_to_native(payload)
             await manager.broadcast(room, payload)
     except WebSocketDisconnect:
         manager.disconnect(websocket, room)
