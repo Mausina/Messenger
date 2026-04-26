@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Messenger</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="auth" class="screen">
+    <div class="auth-card">
+        <h1>☁️ Cloud Messenger</h1>
+        <p class="subtitle">AWS-powered chat (DynamoDB + S3 + EC2 + CloudWatch)</p>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="login">Login</button>
+            <button class="tab" data-tab="register">Register</button>
+        </div>
+
+        <input id="username" placeholder="username" autocomplete="off">
+        <input id="password" type="password" placeholder="password">
+        <button id="auth-btn">Login</button>
+        <p id="auth-error" class="error"></p>
+    </div>
+</div>
+
+<div id="chat" class="screen hidden">
+    <aside class="sidebar">
+        <div class="user-info">
+            <span id="me"></span>
+            <button id="logout">×</button>
+        </div>
+        <div class="rooms-header">Rooms</div>
+        <ul id="rooms">
+            <li class="active" data-room="general">#general</li>
+            <li data-room="random">#random</li>
+            <li data-room="dev">#dev</li>
+        </ul>
+        <div class="new-room">
+            <input id="new-room-input" placeholder="join room...">
+            <button id="new-room-btn">+</button>
+        </div>
+    </aside>
+
+    <main class="chat-main">
+        <header class="chat-header">
+            <span id="current-room">#general</span>
+            <span id="status" class="status">connecting…</span>
+        </header>
+        <div id="messages" class="messages"></div>
+        <div id="typing-indicator" class="typing-indicator"></div>
+        <form id="send-form" class="send-form">
+            <label class="upload-btn" title="Upload file (S3)">
+                📎
+                <input type="file" id="file-input" hidden>
+            </label>
+            <input id="msg-input" placeholder="Type a message..." autocomplete="off">
+            <button type="submit">Send</button>
+        </form>
+    </main>
+
+    <aside class="online-panel">
+        <div class="online-header">Online</div>
+        <ul id="online-list"></ul>
+    </aside>
+</div>
+
+<div id="reaction-picker" class="reaction-picker hidden">
+    <span data-emoji="👍">👍</span>
+    <span data-emoji="❤️">❤️</span>
+    <span data-emoji="😂">😂</span>
+    <span data-emoji="🔥">🔥</span>
+    <span data-emoji="😮">😮</span>
+    <span data-emoji="🎉">🎉</span>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,248 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f1419;
+    color: #e7e9ea;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.screen { height: 100vh; display: flex; }
+.hidden { display: none !important; }
+
+/* === AUTH === */
+#auth {
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1f2e 0%, #0f1419 100%);
+}
+
+.auth-card {
+    background: #1a1f2e;
+    border: 1px solid #2f3336;
+    border-radius: 16px;
+    padding: 40px;
+    width: 380px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.auth-card h1 { font-size: 28px; margin-bottom: 4px; }
+.subtitle { color: #71767b; font-size: 13px; margin-bottom: 24px; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.tab {
+    flex: 1; padding: 8px; background: #15191e; border: 1px solid #2f3336;
+    color: #71767b; cursor: pointer; border-radius: 8px;
+    transition: all 0.15s;
+}
+.tab.active { background: #1d9bf0; color: white; border-color: #1d9bf0; }
+
+.auth-card input {
+    width: 100%; padding: 12px 14px; margin-bottom: 12px;
+    background: #15191e; border: 1px solid #2f3336; border-radius: 8px;
+    color: #e7e9ea; font-size: 15px;
+}
+.auth-card input:focus { outline: none; border-color: #1d9bf0; }
+
+.auth-card button#auth-btn {
+    width: 100%; padding: 12px; background: #1d9bf0; color: white;
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+}
+.auth-card button#auth-btn:hover { background: #1a8cd8; }
+
+.error { color: #f4212e; font-size: 13px; margin-top: 10px; min-height: 16px; }
+
+/* === CHAT === */
+.sidebar {
+    width: 240px; background: #15181c; border-right: 1px solid #2f3336;
+    display: flex; flex-direction: column;
+}
+
+.user-info {
+    padding: 16px; border-bottom: 1px solid #2f3336;
+    display: flex; justify-content: space-between; align-items: center;
+    font-weight: 600;
+}
+#logout {
+    background: transparent; border: none; color: #71767b;
+    font-size: 24px; cursor: pointer; line-height: 1;
+}
+#logout:hover { color: #f4212e; }
+
+.rooms-header {
+    padding: 16px 16px 8px; font-size: 11px; text-transform: uppercase;
+    color: #71767b; letter-spacing: 0.5px;
+}
+
+#rooms { list-style: none; flex: 1; overflow-y: auto; }
+#rooms li {
+    padding: 10px 16px; cursor: pointer; transition: background 0.1s;
+    color: #d4d6d8;
+}
+#rooms li:hover { background: #1d2025; }
+#rooms li.active { background: #1d9bf0; color: white; }
+
+.new-room {
+    padding: 12px; border-top: 1px solid #2f3336; display: flex; gap: 6px;
+}
+.new-room input {
+    flex: 1; padding: 6px 10px; background: #0f1419; border: 1px solid #2f3336;
+    border-radius: 6px; color: #e7e9ea; font-size: 13px;
+}
+.new-room button {
+    padding: 6px 12px; background: #1d9bf0; color: white; border: none;
+    border-radius: 6px; cursor: pointer; font-weight: 600;
+}
+
+.chat-main { flex: 1; display: flex; flex-direction: column; }
+
+.chat-header {
+    padding: 16px 24px; border-bottom: 1px solid #2f3336;
+    display: flex; justify-content: space-between; align-items: center;
+    font-weight: 600;
+}
+.status {
+    font-size: 12px; color: #00ba7c; font-weight: 400;
+}
+.status.disconnected { color: #f4212e; }
+
+.messages {
+    flex: 1; overflow-y: auto; padding: 16px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+}
+
+.msg {
+    max-width: 70%; padding: 10px 14px; border-radius: 12px;
+    word-wrap: break-word;
+}
+.msg.own {
+    align-self: flex-end; background: #1d9bf0; color: white;
+    border-bottom-right-radius: 4px;
+}
+.msg.other {
+    align-self: flex-start; background: #1d2025;
+    border-bottom-left-radius: 4px;
+}
+.msg .sender { font-size: 12px; font-weight: 600; color: #1d9bf0; margin-bottom: 2px; }
+.msg.own .sender { display: none; }
+.msg .content { font-size: 14px; line-height: 1.4; }
+.msg .ts { font-size: 10px; color: #71767b; margin-top: 4px; text-align: right; }
+.msg.own .ts { color: rgba(255,255,255,0.6); }
+
+.msg.system {
+    align-self: center; background: transparent; color: #71767b;
+    font-size: 12px; font-style: italic;
+}
+
+.msg .file-link {
+    display: inline-block; padding: 6px 10px; background: rgba(0,0,0,0.2);
+    border-radius: 6px; color: inherit; text-decoration: none;
+    font-size: 13px;
+}
+.msg .file-link:hover { text-decoration: underline; }
+
+.msg img { max-width: 240px; border-radius: 8px; margin-top: 4px; }
+
+.send-form {
+    padding: 16px 24px; border-top: 1px solid #2f3336;
+    display: flex; gap: 8px; align-items: center;
+}
+.upload-btn {
+    cursor: pointer; padding: 10px; font-size: 18px;
+    background: #1d2025; border-radius: 50%; line-height: 1;
+}
+.upload-btn:hover { background: #2f3336; }
+
+#msg-input {
+    flex: 1; padding: 10px 14px; background: #1d2025; border: 1px solid #2f3336;
+    border-radius: 20px; color: #e7e9ea; font-size: 14px;
+}
+#msg-input:focus { outline: none; border-color: #1d9bf0; }
+
+.send-form button[type="submit"] {
+    padding: 10px 20px; background: #1d9bf0; color: white; border: none;
+    border-radius: 20px; cursor: pointer; font-weight: 600;
+}
+.send-form button[type="submit"]:hover { background: #1a8cd8; }
+.send-form button[type="submit"]:disabled { background: #2f3336; cursor: not-allowed; }
+
+/* === ONLINE PANEL === */
+.online-panel {
+    width: 200px; background: #15181c; border-left: 1px solid #2f3336;
+    display: flex; flex-direction: column;
+}
+.online-header {
+    padding: 16px 16px 8px; font-size: 11px; text-transform: uppercase;
+    color: #71767b; letter-spacing: 0.5px;
+}
+#online-list { list-style: none; flex: 1; overflow-y: auto; }
+#online-list li {
+    padding: 8px 16px; display: flex; align-items: center; gap: 8px;
+    color: #d4d6d8; font-size: 14px;
+}
+#online-list li::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    background: #00ba7c; flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(0, 186, 124, 0.5);
+}
+#online-list li.me { font-weight: 600; }
+
+/* === TYPING INDICATOR === */
+.typing-indicator {
+    height: 22px; padding: 0 24px; font-size: 12px; color: #71767b;
+    font-style: italic; display: flex; align-items: center; gap: 4px;
+}
+.typing-indicator.active::after {
+    content: ""; display: inline-block; width: 24px; height: 8px;
+    background-image:
+        radial-gradient(circle, #71767b 2px, transparent 2.5px),
+        radial-gradient(circle, #71767b 2px, transparent 2.5px),
+        radial-gradient(circle, #71767b 2px, transparent 2.5px);
+    background-size: 8px 8px;
+    background-position: 0 0, 8px 0, 16px 0;
+    background-repeat: no-repeat;
+    animation: typing 1.2s infinite;
+}
+@keyframes typing {
+    0%, 60%, 100% { opacity: 0.3; }
+    30% { opacity: 1; }
+}
+
+/* === REACTIONS === */
+.msg { position: relative; }
+.msg .react-btn {
+    position: absolute; top: -10px; right: -10px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #1d2025; border: 1px solid #2f3336;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    font-size: 14px;
+}
+.msg.own .react-btn { right: auto; left: -10px; }
+.msg:hover .react-btn { display: flex; }
+.msg .react-btn:hover { background: #2f3336; }
+
+.reactions {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
+}
+.reaction {
+    background: rgba(0, 0, 0, 0.25); padding: 2px 8px; border-radius: 12px;
+    font-size: 12px; cursor: pointer; display: inline-flex; align-items: center;
+    gap: 4px; border: 1px solid transparent; transition: all 0.1s;
+}
+.reaction:hover { background: rgba(0, 0, 0, 0.4); }
+.reaction.mine { background: rgba(29, 155, 240, 0.2); border-color: #1d9bf0; }
+.reaction .count { font-size: 11px; color: inherit; opacity: 0.85; }
+
+.reaction-picker {
+    position: fixed; background: #1d2025; border: 1px solid #2f3336;
+    border-radius: 24px; padding: 6px 8px; display: flex; gap: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 100;
+}
+.reaction-picker.hidden { display: none; }
+.reaction-picker span {
+    cursor: pointer; padding: 4px 6px; border-radius: 50%;
+    transition: background 0.1s; font-size: 18px;
+}
+.reaction-picker span:hover { background: #2f3336; transform: scale(1.2); }
