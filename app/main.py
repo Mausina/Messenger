@@ -3,7 +3,6 @@ Cloud Messenger - FastAPI backend
 AWS services used:
 - DynamoDB: messages and users storage
 - S3: avatars and file uploads
-- Cognito: authentication (optional, falls back to local JWT for dev)
 - CloudWatch: logging via boto3 logs handler
 - EC2: deployment target
 
@@ -39,6 +38,22 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 log = logging.getLogger("messenger")
+
+# Send logs to CloudWatch when running on AWS
+if USE_AWS:
+    try:
+        import watchtower
+        import boto3
+        boto3_logs_client = boto3.client("logs", region_name=AWS_REGION)
+        cw_handler = watchtower.CloudWatchLogHandler(
+            log_group_name="/messenger/app",
+            stream_name="ec2-server",
+            boto3_client=boto3_logs_client,
+        )
+        log.addHandler(cw_handler)
+        log.info("CloudWatch logging enabled")
+    except Exception as e:
+        log.warning(f"CloudWatch logging not available: {e}")
 
 # ---------- Storage layer (AWS or in-memory) ----------
 
